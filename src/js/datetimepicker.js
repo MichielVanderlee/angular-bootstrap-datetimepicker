@@ -59,6 +59,7 @@
 
       // Behavior
       $scope.changeView = changeView
+      $scope.onMouseOver = onMouseOver
       ngModelController.$render = $render
 
       if (configuration.configureOn) {
@@ -114,11 +115,42 @@
             $dates: result.dates || weekDates,
             $leftDate: result.leftDate,
             $upDate: result.previousViewDate,
-            $rightDate: result.rightDate
+            $rightDate: result.rightDate,
+            $mouseOverDate: null
           })
 
           $scope.data = result
         }
+      }
+
+      function onMouseOver(dateObject, $event) {
+        if (!dateObject.selectable) {
+          return;
+        }
+
+        var result = $scope.data
+
+        var weekDates = []
+        if (result.weeks) {
+          for (var i = 0; i < result.weeks.length; i += 1) {
+            var week = result.weeks[i]
+            for (var j = 0; j < week.dates.length; j += 1) {
+              var weekDate = week.dates[j]
+              weekDates.push(weekDate)
+            }
+          }
+        }
+
+        $scope.beforeRender({
+          $view: result.currentView,
+          $dates: result.dates || weekDates,
+          $leftDate: result.leftDate,
+          $upDate: result.previousViewDate,
+          $rightDate: result.rightDate,
+          $mouseOverDate: dateObject
+        })
+
+        $scope.data = result
       }
 
       function yearModelFactory (milliseconds) {
@@ -430,7 +462,7 @@
         return this.utcDateValue + localOffset
       }
 
-      var validProperties = ['active', 'current', 'display', 'future', 'past', 'selectable', 'utcDateValue']
+      var validProperties = ['active', 'current', 'display', 'future', 'past', 'selectable', 'utcDateValue', 'class']
 
       var constructorObject = arguments[0]
 
